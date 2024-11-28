@@ -115,7 +115,10 @@ float FVector2::LengthSq() const
 FVector2& FVector2::Normalise()
 {
     const float Len = Length();
-    *this /= Len;
+    if (Len > 0.0f) 
+    {
+        *this /= Len;
+    }
 
     return *this;
 }

@@ -26,6 +26,7 @@ public:
 
 private:
     void TickCollisionDetection();
+    void TickCollisionResolution();
 
     void RenderBodies(FRenderer& Renderer) const;
     void RenderContacts(FRenderer& Renderer) const;

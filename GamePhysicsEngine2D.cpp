@@ -5,6 +5,7 @@
 #include "physics/shapes/ShapeBox.h"
 
 #include "physics/CollisionDetection.h"
+#include "physics/CollisionResolution.h"
 
 FGamePhysicsEngine2D::FGamePhysicsEngine2D()
 {
@@ -45,11 +46,16 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 #endif
 
     MouseMoveBody = Bodies[0];
+
+    // Collision Response requires bodies have mass
+    Bodies[0]->SetMass(10.0);
+    Bodies[1]->SetMass(0.0);
 }
 
 void FGamePhysicsEngine2D::Tick(float dt)
 {
     TickCollisionDetection();
+    TickCollisionResolution();
 }
 
 void FGamePhysicsEngine2D::TickCollisionDetection()
@@ -81,6 +87,14 @@ void FGamePhysicsEngine2D::TickCollisionDetection()
                 B->bIsColliding = true;
             }
         }
+    }
+}
+
+void FGamePhysicsEngine2D::TickCollisionResolution()
+{
+    for (const FContact& Contact: Contacts)
+    {
+        FCollisionResolution::ResolveCollision(Contact);
     }
 }
 

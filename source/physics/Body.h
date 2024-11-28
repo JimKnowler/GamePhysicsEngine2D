@@ -14,14 +14,18 @@ public:
 
     // Clockwise Rotation, in Radians
     void SetRotation(float NewRotation);
-
-    void SetLocation(const FVector2& NewLocation);
-
     float GetRotation() const;
 
+    void SetLocation(const FVector2& NewLocation);
     const FVector2& GetLocation() const;
 
     const FColour& GetColour() const;
+
+    void SetMass(float Mass);
+    float GetMass() const;
+    float GetInvMass() const;
+
+    bool IsStatic() const;
 
     // Used to render whether a body is colliding during the current frame
     bool bIsColliding = false;
@@ -36,4 +40,7 @@ private:
     float Rotation;
 
     FColour Colour;
+
+    float Mass = 0.0f;
+    float InvMass = 0.0f;
 };

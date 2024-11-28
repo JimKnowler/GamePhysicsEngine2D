@@ -48,3 +48,31 @@ void FBody::UpdateShape()
 {
     Shape->UpdateWorldTransform(Location, Rotation);
 }
+
+void FBody::SetMass(float InMass)
+{
+    Mass = InMass;
+    if (Mass > 0.0f) 
+    {
+        InvMass = 1.0f / Mass;
+    } else {
+        InvMass = 0.0f;
+    }
+}
+
+float FBody::GetMass() const
+{
+    return Mass;
+}
+
+float FBody::GetInvMass() const
+{
+    return InvMass;
+}
+
+bool FBody::IsStatic() const
+{
+    const float Epsilon = 0.001f;
+
+    return InvMass < Epsilon;
+}

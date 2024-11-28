@@ -195,6 +195,9 @@ bool FCollisionDetection::DetectCollisionPolygonCircle(FBody* A, FBody* B, FCont
     FVector2 Normal = NearestPointToCircle;
     Normal.Normalise();
 
+    OutContact.A = A;
+    OutContact.B = B;
+
     if (bIsOutside) 
     {
         OutContact.Normal = Normal;

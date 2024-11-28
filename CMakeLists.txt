@@ -5,6 +5,7 @@ set(ProjectName "GamePhysicsEngine2D")
 list(APPEND ProjectSources ${ProjectName}.cpp 
     source/physics/Body.cpp
     source/physics/CollisionDetection.cpp
+    source/physics/CollisionResolution.cpp
     source/physics/IShape.cpp
     source/physics/shapes/ShapeBox.cpp
     source/physics/shapes/ShapePolygon.cpp
