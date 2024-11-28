@@ -2,8 +2,9 @@
 
 #include "Application.h"
 
+#include "physics/Body.h"
+
 #include <vector>
-#include <tuple>
 
 class FGamePhysicsEngine2D : public FApplication
 {
@@ -14,14 +15,10 @@ public:
     virtual void Tick(float dt) override;
     virtual void Render(FRenderer& Renderer) override;
     virtual void MouseButtonPressed(int X, int Y, int Button) override;
+    virtual void MouseButtonReleased(int X, int Y, int Button) override;
+    virtual void MouseMoved(int X, int Y) override;
     // << FApplication
 
 private:
-    double X;
-    double XSpeed;
-
-    double Rotation;
-    double RotationSpeed;
-
-    std::vector<std::tuple<int,int>> Points;
+    std::vector<FBody*> Bodies;
 };

@@ -2,11 +2,15 @@
 
 #include "IShape.h"
 #include "Vector2.h"
+#include "Colour.h"
 
 class FBody 
 {
 public:
-    FBody(IShape* Shape, const FVector2& Location);
+    FBody(IShape* Shape, const FVector2& Location, const FColour& Colour);
+    FBody(IShape* Shape, const FVector2& Location, float Rotation, const FColour& Colour);
+
+    IShape* GetShape() const;
 
     // Clockwise Rotation, in Radians
     void SetRotation(float NewRotation);
@@ -17,9 +21,13 @@ public:
 
     const FVector2& GetLocation() const;
 
+    const FColour& GetColour() const;
+
 private:
     IShape* Shape;
     
     FVector2 Location;
     float Rotation;
+
+    FColour Colour;
 };

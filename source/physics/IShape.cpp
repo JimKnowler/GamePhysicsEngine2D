@@ -9,3 +9,8 @@ EShape IShape::GetShape() const
 {
     return Shape;
 }
+
+void IShape::UpdateWorldTransform(const FVector2& Location, const float Rotation)
+{
+
+}

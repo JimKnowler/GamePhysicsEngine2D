@@ -1,67 +1,66 @@
 #include "GamePhysicsEngine2D.h"
 
-FGamePhysicsEngine2D::FGamePhysicsEngine2D() : X(0.0), XSpeed(1000.0), Rotation(0.0), RotationSpeed(M_PI)
-{
+#include "physics/shapes/ShapePolygon.h"
+#include "physics/shapes/ShapeCircle.h"
+#include "physics/shapes/ShapeBox.h"
 
+FGamePhysicsEngine2D::FGamePhysicsEngine2D()
+{ 
+    Bodies.push_back(new FBody(new FShapeCircle(100), {200,200}, M_PI/4.0, FColour::Red));
+    Bodies.push_back(new FBody(new FShapeBox(200, 100), {400,400}, M_PI/3.0, FColour::Blue));
+    Bodies.push_back(new FBody(new FShapePolygon({ {0,0}, {100, 10}, {110, 40}, {30, 50}, {50, 10} }), {600,600}, M_PI/2.0, FColour::Green));
 }
 
 void FGamePhysicsEngine2D::Tick(float dt)
 {
-    X += (XSpeed * dt);
-    if (X > Config.WindowWidth) {
-        XSpeed = -XSpeed;
-        X = Config.WindowWidth;
-    } else if (X < 0) {
-        XSpeed = -XSpeed;
-        X = 0;
-    }
 
-    Rotation += (RotationSpeed * dt);
-    if (Rotation > (2.0 * M_PI)) 
-    {
-        Rotation -= (2.0 * M_PI);
-    }
 }
 
 void FGamePhysicsEngine2D::Render(FRenderer& Renderer)
 {
-    // Draw rect at animated X position
-    Renderer.DrawRect(X, 200, 50, 75, FColour::White);
-
-    // Draw polygon at animated Rotation
-    std::vector<FVector2> Polygon = { {10,10}, {400,10}, {300,200}, {5,300} };
-    const FVector2 PolygonOrigin = {200, 100};
-    for (FVector2& PolygonPoint: Polygon) 
+    for (const FBody* Body: Bodies)
     {
-        PolygonPoint -= PolygonOrigin;
-        PolygonPoint.Rotate(Rotation);
-        PolygonPoint += PolygonOrigin;
-    }
-    Renderer.DrawPolygon(Polygon, FColour::Green);
+        const FVector2 Location = Body->GetLocation();
+        const float Rotation = Body->GetRotation();
+        const IShape* Shape = Body->GetShape();
+        const FColour Colour = Body->GetColour();
 
-    // Draw Circles at locations where mouse was clicked + a path between points
-    for (size_t i=0; i<Points.size(); i++) 
-    {
-        const auto& Point = Points[i];
-
-        int X = std::get<0>(Point);
-        int Y = std::get<1>(Point);
-
-        Renderer.DrawCircle(X, Y, 100.0f, Rotation, FColour::Purple);
-
-        if (i > 0) 
+        switch(Shape->GetShape())
         {
-            const auto& PointPrev = Points[i-1];
-
-            int X2 = std::get<0>(PointPrev);
-            int Y2 = std::get<1>(PointPrev);
-
-            Renderer.DrawLine(X, Y, X2, Y2, FColour::Yellow);
+            case EShape::Circle:
+            {
+                const FShapeCircle* Circle = static_cast<const FShapeCircle*>(Shape);
+                Renderer.DrawCircle(Location.X, Location.Y, Circle->GetRadius(), Rotation, Colour);
+                break;
+            }
+            case EShape::Box:
+            case EShape::Polygon:
+            {
+                const FShapePolygon* Polygon = static_cast<const FShapePolygon*>(Shape);
+                Renderer.DrawPolygon(Polygon->GetVerticesWorld(), Colour);
+                break;
+            }
+            default:
+                break;
         }
+
+        // center of mass
+        Renderer.DrawCircle(Location.X, Location.Y, 3, Colour);
     }
 }
 
 void FGamePhysicsEngine2D::MouseButtonPressed(int X, int Y, int Button) 
 {
-    Points.push_back({X, Y});
+
 }
+
+void FGamePhysicsEngine2D::MouseButtonReleased(int X, int Y, int Button) 
+{
+
+}
+
+void FGamePhysicsEngine2D::MouseMoved(int X, int Y) 
+{
+
+}
+
