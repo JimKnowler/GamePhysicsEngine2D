@@ -9,7 +9,7 @@ public:
     FApplication();
     ~FApplication();
 
-    void Init(const FConfig& InConfig);
+    virtual void Init(const FConfig& InConfig);
 
     // Run the application and start its' event loop.
     // This function exits when the application exits.
