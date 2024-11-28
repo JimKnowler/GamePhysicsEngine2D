@@ -1,4 +1,6 @@
-Basic SDL2 app, demonstrating rendering an animated, axis-aligned box.
+GamePhysicsEngine2D - Following the ['Pikuma' 2D Game Physics Programming course](https://pikuma.com/courses/game-physics-engine-programming)
+
+
 
 # Dependencies
 
@@ -29,17 +31,5 @@ cmake --build .
 While standing in the build directory, you can run your application with:
 
 ```
-./MyApplication     
+./GamePhysicsEngine2D     
 ```
-
-# Configure Project
-
-Modify CMakeLists.txt to set variable names for your project
-- ProjectName
-    - Set this to the name of your application
-- ProjectSources
-    - Add any more 
-- MyApplication.h/.cpp
-    - Rename to the name of your project & modify as required
-- Main.cpp
-    - Modify name of 'MyApplication'
