@@ -5,10 +5,28 @@
 #include "physics/shapes/ShapeBox.h"
 
 FGamePhysicsEngine2D::FGamePhysicsEngine2D()
-{ 
-    Bodies.push_back(new FBody(new FShapeCircle(100), {200,200}, M_PI/4.0, FColour::Red));
-    Bodies.push_back(new FBody(new FShapeBox(200, 100), {400,400}, M_PI/3.0, FColour::Blue));
-    Bodies.push_back(new FBody(new FShapePolygon({ {0,0}, {100, 10}, {110, 40}, {30, 50}, {50, 10} }), {600,600}, M_PI/2.0, FColour::Green));
+{
+}
+
+void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
+{
+    FApplication::Init(InConfig);
+
+    const FVector2 Location = {.X = InConfig.WindowWidth / 2.0f,InConfig.WindowHeight / 2.0f};
+
+#if 1
+    constexpr float Radius = 100.0f;
+
+    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
+    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/5.0, FColour::Blue));
+#else
+    constexpr float BoxSize = 200.0f;
+    
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI/3.0, FColour::Blue));
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI/5.0, FColour::Blue));
+#endif
+
+    MouseMoveBody = Bodies[0];
 }
 
 void FGamePhysicsEngine2D::Tick(float dt)
@@ -17,6 +35,11 @@ void FGamePhysicsEngine2D::Tick(float dt)
 }
 
 void FGamePhysicsEngine2D::Render(FRenderer& Renderer)
+{
+    RenderBodies(Renderer);
+}
+
+void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
 {
     for (const FBody* Body: Bodies)
     {
@@ -61,6 +84,6 @@ void FGamePhysicsEngine2D::MouseButtonReleased(int X, int Y, int Button)
 
 void FGamePhysicsEngine2D::MouseMoved(int X, int Y) 
 {
-
+    MouseMoveBody->SetLocation({static_cast<float>(X),static_cast<float>(Y)});
 }
 

@@ -12,6 +12,7 @@ public:
     FGamePhysicsEngine2D();
 
     // >> FApplication
+    virtual void Init(const FConfig& InConfig) override;
     virtual void Tick(float dt) override;
     virtual void Render(FRenderer& Renderer) override;
     virtual void MouseButtonPressed(int X, int Y, int Button) override;
@@ -20,5 +21,9 @@ public:
     // << FApplication
 
 private:
+    void RenderBodies(FRenderer& Renderer);
+
     std::vector<FBody*> Bodies;
+
+    FBody* MouseMoveBody;
 };
