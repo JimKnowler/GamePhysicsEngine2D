@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "ios": "cpp",
+        "cstdint": "cpp",
+        "locale": "cpp",
+        "new": "cpp",
+        "string": "cpp",
+        "typeinfo": "cpp",
+        "__locale": "cpp",
+        "bitset": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "streambuf": "cpp"
+    }
+}
