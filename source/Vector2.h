@@ -32,6 +32,9 @@ struct FVector2
     // Normalise this vector
     FVector2& Normalise();
 
+    // Treat this vector as an edge, and generate its normal (assuming clockwise winding rule)
+    FVector2 Normal() const;
+
     // TODO:
     // CrossProduct -> 2D, generates a scalar 
 };

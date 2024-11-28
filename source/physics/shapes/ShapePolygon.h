@@ -9,6 +9,7 @@ class FShapePolygon : public IShape
 {
 public:
     // initialise with vertices in local space
+    // NOTE: vertices assumes clockwise winding order
     FShapePolygon(const std::vector<FVector2>& Vertices);
 
     // Get Vertices, in local space
@@ -21,8 +22,10 @@ public:
     virtual void UpdateWorldTransform(const FVector2& Location, const float Rotation) override;
     // << IShape
 
+    static float FindMinSeparation(const FShapePolygon* A, const FShapePolygon* B, FVector2& OutPoint, FVector2& OutNormal);
+
 protected:
-    FShapePolygon(const std::vector<FVector2>& Vertices, EShape Shape);
+    FShapePolygon(const std::vector<FVector2>& Vertices, EShapeType ShapeType);
 
 private:
     std::vector<FVector2> VerticesLocal;

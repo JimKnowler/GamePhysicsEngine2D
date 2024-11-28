@@ -1,11 +1,14 @@
 #pragma once
 
 #include "Application.h"
+#include "Colour.h"
 
 #include "physics/Body.h"
 #include "physics/Contact.h"
 
 #include <vector>
+
+class FShapePolygon;
 
 class FGamePhysicsEngine2D : public FApplication
 {
@@ -24,8 +27,9 @@ public:
 private:
     void TickCollisionDetection();
 
-    void RenderBodies(FRenderer& Renderer);
-    void RenderContacts(FRenderer& Renderer);
+    void RenderBodies(FRenderer& Renderer) const;
+    void RenderContacts(FRenderer& Renderer) const;
+    void RenderPolygonNormals(FRenderer& Renderer, const FShapePolygon* Polygon, const FColour& Colour) const;
 
     std::vector<FBody*> Bodies;
 

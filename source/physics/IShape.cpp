@@ -1,16 +1,16 @@
 #include "IShape.h"
 
-IShape::IShape(EShape InShape)
+IShape::IShape(EShapeType InShapeType)
 {
-    Shape = InShape;
+    ShapeType = InShapeType;
 }
 
-EShape IShape::GetShape() const
+EShapeType IShape::GetShapeType() const
 {
-    return Shape;
+    return ShapeType;
 }
 
 void IShape::UpdateWorldTransform(const FVector2& Location, const float Rotation)
 {
-
+    // optionally implement in sub-class
 }

@@ -16,16 +16,18 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 
     const FVector2 Location = {.X = InConfig.WindowWidth / 2.0f,InConfig.WindowHeight / 2.0f};
 
-#if 1
+#if 0
+    // 2 Spheres
     constexpr float Radius = 100.0f;
 
     Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
     Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/5.0, FColour::Blue));
 #else
+    // 2 Boxes
     constexpr float BoxSize = 200.0f;
     
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI/3.0, FColour::Blue));
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI/5.0, FColour::Blue));
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, 0.0f, FColour::Blue));
 #endif
 
     MouseMoveBody = Bodies[0];
@@ -74,7 +76,7 @@ void FGamePhysicsEngine2D::Render(FRenderer& Renderer)
     RenderContacts(Renderer);
 }
 
-void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
+void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer) const
 {
     const FColour ColourBodyCollinding = FColour::Purple;
 
@@ -85,19 +87,22 @@ void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
         const IShape* Shape = Body->GetShape();
         const FColour Colour = Body->bIsColliding? ColourBodyCollinding : Body->GetColour();
 
-        switch(Shape->GetShape())
+        switch(Shape->GetShapeType())
         {
-            case EShape::Circle:
+            case EShapeType::Circle:
             {
                 const FShapeCircle* Circle = static_cast<const FShapeCircle*>(Shape);
                 Renderer.DrawCircle(Location.X, Location.Y, Circle->GetRadius(), Rotation, Colour);
                 break;
             }
-            case EShape::Box:
-            case EShape::Polygon:
+            case EShapeType::Box:
+            case EShapeType::Polygon:
             {
                 const FShapePolygon* Polygon = static_cast<const FShapePolygon*>(Shape);
                 Renderer.DrawPolygon(Polygon->GetVerticesWorld(), Colour);
+#if 0
+                RenderPolygonNormals(Renderer, Polygon, Colour);
+#endif
                 break;
             }
             default:
@@ -109,7 +114,7 @@ void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
     }
 }
 
-void FGamePhysicsEngine2D::RenderContacts(FRenderer& Renderer)
+void FGamePhysicsEngine2D::RenderContacts(FRenderer& Renderer) const
 {
     constexpr float Radius = 3.0f;
     const FColour Colour = FColour::Red;
@@ -122,6 +127,23 @@ void FGamePhysicsEngine2D::RenderContacts(FRenderer& Renderer)
 
         const FVector2 NormalEnd = Contact.Start + (Contact.Normal * NormalLength);
         Renderer.DrawLine(Contact.Start.X, Contact.Start.Y, NormalEnd.X, NormalEnd.Y, Colour);
+    }
+}
+
+void FGamePhysicsEngine2D::RenderPolygonNormals(FRenderer& Renderer, const FShapePolygon* Polygon, const FColour& Colour) const
+{
+    const std::vector<FVector2> Vertices = Polygon->GetVerticesWorld();
+    const size_t NumVertices = Vertices.size();
+    for (size_t i = 0; i < NumVertices; i++)
+    {
+        const FVector2 Vertex = Vertices[i];
+        const FVector2 NextVertex = Vertices[(i+1) % NumVertices];
+        const FVector2 Edge = (NextVertex - Vertex).Normalise();
+        const FVector2 Normal = Edge.Normal();
+        const FVector2 NormalStart = (Vertex + NextVertex) * 0.5f;
+        const float NormalLength = 10.0f;
+        const FVector2 NormalEnd = NormalStart + (Normal * NormalLength);
+        Renderer.DrawLine(NormalStart.X, NormalStart.Y, NormalEnd.X, NormalEnd.Y, Colour);
     }
 }
 

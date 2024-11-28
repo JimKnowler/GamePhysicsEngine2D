@@ -1,20 +1,14 @@
 #pragma once
 
 #include "Vector2.h"
-
-enum class EShape
-{
-    Circle,
-    Polygon,
-    Box
-};
+#include "ShapeType.h"
 
 class IShape
 {
 public:
-    IShape(EShape Shape);
+    IShape(EShapeType ShapeType);
 
-    EShape GetShape() const;
+    EShapeType GetShapeType() const;
 
 protected:
     friend class FBody;
@@ -22,5 +16,5 @@ protected:
     virtual void UpdateWorldTransform(const FVector2& Location, const float Rotation);
 
 private:
-    EShape Shape;
+    EShapeType ShapeType;
 };

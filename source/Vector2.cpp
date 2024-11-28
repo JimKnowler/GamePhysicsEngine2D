@@ -119,3 +119,13 @@ FVector2& FVector2::Normalise()
 
     return *this;
 }
+
+FVector2 FVector2::Normal() const 
+{
+    FVector2 N = {
+        .X = Y,
+        .Y = -X
+    };
+
+    return N;
+}

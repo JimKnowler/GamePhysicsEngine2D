@@ -1,6 +1,6 @@
 #include "ShapeCircle.h"
 
-FShapeCircle::FShapeCircle(float InRadius) : IShape(EShape::Circle), Radius(InRadius)
+FShapeCircle::FShapeCircle(float InRadius) : IShape(EShapeType::Circle), Radius(InRadius)
 {
 
 }
