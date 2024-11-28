@@ -23,6 +23,9 @@ public:
 
     const FColour& GetColour() const;
 
+protected:
+    void UpdateShape();
+
 private:
     IShape* Shape;
     
