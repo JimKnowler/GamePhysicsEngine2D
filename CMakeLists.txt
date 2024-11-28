@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.31)
 
 # Modify these settings for your application
 set(ProjectName "GamePhysicsEngine2D")
-list(APPEND ProjectSources ${ProjectName}.cpp)
+list(APPEND ProjectSources ${ProjectName}.cpp source/physics/Body.cpp source/physics/IShape.cpp source/physics/shapes/ShapeBox.cpp source/physics/shapes/ShapePolygon.cpp source/physics/shapes/ShapeCircle.cpp)
 
 # Common settings for all applications
 project(${ProjectName})
