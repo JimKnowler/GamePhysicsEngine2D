@@ -19,16 +19,12 @@ bool FCollisionDetection::DetectCollision(FBody* A, FBody* B, FContact& OutConta
             switch (ShapeTypeB)
             {
                 case EShapeType::Circle:
-                {
                     return DetectCollisionCircleCircle(A, B, OutContact);
-                }
                 case EShapeType::Box:
                 case EShapeType::Polygon:
+                    return DetectCollisionPolygonCircle(B, A, OutContact);
                 default:
-                {
-                    // TODO
                     break;
-                }
             }
             break;
         }
@@ -39,15 +35,11 @@ bool FCollisionDetection::DetectCollision(FBody* A, FBody* B, FContact& OutConta
             {
                 case EShapeType::Box:
                 case EShapeType::Polygon:
-                {
                     return DetectCollisionPolygonPolygon(A, B, OutContact);
-                }
                 case EShapeType::Circle:
+                    return DetectCollisionPolygonCircle(A, B, OutContact);
                 default:
-                {
-                    // TODO
                     break;
-                }
             }
             break;
         }
@@ -136,6 +128,85 @@ bool FCollisionDetection::DetectCollisionPolygonPolygon(FBody* A, FBody* B, FCon
         OutContact.Start = PointB + (NormalB * OutContact.Depth);
         OutContact.End = PointB;
     }
+
+    return true;
+}
+
+bool FCollisionDetection::DetectCollisionPolygonCircle(FBody* A, FBody* B, FContact& OutContact)
+{
+    const IShape* ShapeA = A->GetShape();
+    const IShape* ShapeB = B->GetShape();
+
+    const FShapePolygon* ShapePolygonA = static_cast<const FShapePolygon*>(ShapeA);
+    const FShapeCircle* ShapeCircleB = static_cast<const FShapeCircle*>(ShapeB);
+    
+    const FVector2 CircleCenter = B->GetLocation();
+    const float CircleRadius = ShapeCircleB->GetRadius();
+
+    const std::vector<FVector2>& Vertices = ShapePolygonA->GetVerticesWorld();
+    const size_t NumVertices = Vertices.size();
+
+    size_t EdgeVertex = -1;
+
+    float DistanceCircleEdge = std::numeric_limits<float>::lowest();
+    bool bIsOutside = false;
+
+    for (size_t i=0; i<NumVertices; i++) 
+    {
+        const FVector2& Vertex = Vertices[i];
+        const FVector2& NextVertex = Vertices[(i+1) % NumVertices];
+        const FVector2 Edge = (NextVertex - Vertex).Normalise();
+        const FVector2 Normal = Edge.Normal();
+
+        const float Distance = (CircleCenter - Vertex).Dot(Normal);
+        if (Distance > 0)
+        {
+            DistanceCircleEdge = Distance;
+            EdgeVertex = i;
+            bIsOutside = true;
+            break;
+        } else if (Distance > DistanceCircleEdge) {
+            // circle center is inside the polygon
+            DistanceCircleEdge = Distance;
+            EdgeVertex = i;
+        }
+    }
+
+    const FVector2& Vertex = Vertices[EdgeVertex];
+    const FVector2& NextVertex = Vertices[(EdgeVertex+1) % NumVertices];
+    const FVector2 Edge = NextVertex - Vertex;
+    const float EdgeLength = Edge.Length();
+    FVector2 EdgeDirection = Edge;
+    EdgeDirection.Normalise();
+
+    // find nearest Point on Edge
+    float P = (CircleCenter - Vertex).Dot(EdgeDirection);
+    P = std::max(P, 0.0f);
+    P = std::min(P, EdgeLength);
+    const FVector2 NearestPoint = Vertex + (EdgeDirection * P);
+
+    const FVector2 NearestPointToCircle = CircleCenter - NearestPoint;
+    const float Distance = NearestPointToCircle.Length();
+    if (Distance > CircleRadius) 
+    {
+        return false;
+    }
+
+    FVector2 Normal = NearestPointToCircle;
+    Normal.Normalise();
+
+    if (bIsOutside) 
+    {
+        OutContact.Normal = Normal;
+        OutContact.Start = CircleCenter - (Normal * CircleRadius);
+        OutContact.End = NearestPoint;
+    } else {
+        OutContact.Normal = Normal * -1.0f;
+        OutContact.Start = CircleCenter + (Normal * CircleRadius);
+        OutContact.End = NearestPoint;
+    }
+
+    OutContact.Depth = (OutContact.Start - OutContact.End).Length();
 
     return true;
 }

@@ -12,4 +12,5 @@ struct FCollisionDetection
 private:
     static bool DetectCollisionCircleCircle(FBody* A, FBody* B, FContact& OutContact);
     static bool DetectCollisionPolygonPolygon(FBody* A, FBody* B, FContact& OutContact);
+    static bool DetectCollisionPolygonCircle(FBody* A, FBody* B, FContact& OutContact);
 };

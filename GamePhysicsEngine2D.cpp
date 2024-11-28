@@ -22,12 +22,26 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 
     Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
     Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/5.0, FColour::Blue));
-#else
+#elif 0
     // 2 Boxes
     constexpr float BoxSize = 200.0f;
     
     Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
     Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, 0.0f, FColour::Blue));
+#elif 0
+    // circle and Box
+    constexpr float Radius = 100.0f;
+    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
+    
+    constexpr float BoxSize = 200.0f; 
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
+#else
+    // Box and Circle
+    constexpr float BoxSize = 200.0f; 
+    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
+
+    constexpr float Radius = 100.0f;
+    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
 #endif
 
     MouseMoveBody = Bodies[0];
