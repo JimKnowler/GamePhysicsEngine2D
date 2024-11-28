@@ -23,6 +23,9 @@ public:
 
     const FColour& GetColour() const;
 
+    // Used to render whether a body is colliding during the current frame
+    bool bIsColliding = false;
+
 protected:
     void UpdateShape();
 

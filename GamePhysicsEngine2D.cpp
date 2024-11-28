@@ -4,6 +4,8 @@
 #include "physics/shapes/ShapeCircle.h"
 #include "physics/shapes/ShapeBox.h"
 
+#include "physics/CollisionDetection.h"
+
 FGamePhysicsEngine2D::FGamePhysicsEngine2D()
 {
 }
@@ -31,22 +33,57 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 
 void FGamePhysicsEngine2D::Tick(float dt)
 {
+    TickCollisionDetection();
+}
 
+void FGamePhysicsEngine2D::TickCollisionDetection()
+{
+    // Clear all contacts
+    Contacts.clear();
+
+    // Clear bIsColliding on all bodies
+    for (FBody* Body: Bodies)
+    {
+        Body->bIsColliding = false;
+    }
+
+    // Detect which bodies are colliding with each other
+    const size_t NumBodies = Bodies.size();
+    for (size_t i = 0; i < (NumBodies-1); i++)
+    {
+        FBody* A = Bodies[i];
+        
+        for (size_t j  = i+1; j < NumBodies; j++)
+        {
+            FBody* B = Bodies[j];
+
+            FContact Contact;
+            if (FCollisionDetection::DetectCollision(A, B, Contact))
+            {
+                Contacts.push_back(Contact);
+                A->bIsColliding = true;
+                B->bIsColliding = true;
+            }
+        }
+    }
 }
 
 void FGamePhysicsEngine2D::Render(FRenderer& Renderer)
 {
     RenderBodies(Renderer);
+    RenderContacts(Renderer);
 }
 
 void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
 {
+    const FColour ColourBodyCollinding = FColour::Purple;
+
     for (const FBody* Body: Bodies)
     {
         const FVector2 Location = Body->GetLocation();
         const float Rotation = Body->GetRotation();
         const IShape* Shape = Body->GetShape();
-        const FColour Colour = Body->GetColour();
+        const FColour Colour = Body->bIsColliding? ColourBodyCollinding : Body->GetColour();
 
         switch(Shape->GetShape())
         {
@@ -69,6 +106,22 @@ void FGamePhysicsEngine2D::RenderBodies(FRenderer& Renderer)
 
         // center of mass
         Renderer.DrawCircle(Location.X, Location.Y, 3, Colour);
+    }
+}
+
+void FGamePhysicsEngine2D::RenderContacts(FRenderer& Renderer)
+{
+    constexpr float Radius = 3.0f;
+    const FColour Colour = FColour::Red;
+    constexpr float NormalLength = 10.0f;
+
+    for (const FContact& Contact: Contacts)
+    {
+        Renderer.DrawCircle(Contact.Start.X, Contact.Start.Y, Radius, Colour);
+        Renderer.DrawCircle(Contact.End.X, Contact.End.Y, Radius, Colour);
+
+        const FVector2 NormalEnd = Contact.Start + (Contact.Normal * NormalLength);
+        Renderer.DrawLine(Contact.Start.X, Contact.Start.Y, NormalEnd.X, NormalEnd.Y, Colour);
     }
 }
 

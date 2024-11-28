@@ -3,6 +3,7 @@
 #include "Application.h"
 
 #include "physics/Body.h"
+#include "physics/Contact.h"
 
 #include <vector>
 
@@ -21,9 +22,14 @@ public:
     // << FApplication
 
 private:
+    void TickCollisionDetection();
+
     void RenderBodies(FRenderer& Renderer);
+    void RenderContacts(FRenderer& Renderer);
 
     std::vector<FBody*> Bodies;
 
     FBody* MouseMoveBody;
+
+    std::vector<FContact> Contacts;
 };
