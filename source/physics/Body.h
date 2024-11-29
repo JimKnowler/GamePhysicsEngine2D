@@ -24,6 +24,8 @@ public:
     void SetMass(float Mass);
     float GetMass() const;
     float GetInvMass() const;
+    float GetI() const;
+    float GetInvI() const;
 
     // Does this body have infitite mass (i.e. InvMass == 0.0f)
     bool IsStatic() const;
@@ -47,7 +49,11 @@ public:
     void SetAngularVelocity(float NewAngularVelocity);
     float GetAngularVelocity() const;
 
+    // apply a linear impulse to the center of mass
     void ApplyImpulse(const FVector2& J);
+
+    // apply an impulse at a specific point on the body
+    void ApplyImpulse(const FVector2& J, const FVector2& R);
 
     // Co-efficient of restitution
     void SetRestitution(float E);
@@ -55,6 +61,7 @@ public:
 
 protected:
     void UpdateShape();
+    void UpdateMomentOfIntertia();
 
 private:
     void ClearForces();

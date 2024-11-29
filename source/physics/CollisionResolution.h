@@ -8,5 +8,6 @@ struct FCollisionResolution
 
 private:
     static void ResolveCollisionProjectionMethod(const FContact& Contact);
-    static void ResolveCollisionImpulseMethod(const FContact& Contact);
+    static void ResolveCollisionImpulseMethodLinear(const FContact& Contact);
+    static void ResolveCollisionImpulseMethodLinearAndAngular(const FContact& Contact);
 };

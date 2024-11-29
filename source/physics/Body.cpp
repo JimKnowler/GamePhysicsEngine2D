@@ -4,14 +4,14 @@ FBody::FBody(IShape* InShape, const FVector2& InLocation, const FColour& InColou
 {
     UpdateShape();
 
-    SetMomentOfIntertia(Shape->GetMomentOfIntertia());
+    UpdateMomentOfIntertia();
 }
 
 FBody::FBody(IShape* InShape, const FVector2& InLocation, float InRotation, const FColour& InColour) : Shape(InShape), Location(InLocation), Rotation(InRotation), Colour(InColour)
 {
     UpdateShape();
 
-    SetMomentOfIntertia(Shape->GetMomentOfIntertia());
+    UpdateMomentOfIntertia();
 }
 
 IShape* FBody::GetShape() const
@@ -53,6 +53,11 @@ void FBody::UpdateShape()
     Shape->UpdateWorldTransform(Location, Rotation);
 }
 
+void FBody::UpdateMomentOfIntertia()
+{
+    SetMomentOfIntertia(Shape->GetMomentOfIntertia() * Mass);
+}
+
 void FBody::SetMass(float InMass)
 {
     Mass = InMass;
@@ -62,6 +67,8 @@ void FBody::SetMass(float InMass)
     } else {
         InvMass = 0.0f;
     }
+
+    UpdateMomentOfIntertia();
 }
 
 float FBody::GetMass() const
@@ -72,6 +79,16 @@ float FBody::GetMass() const
 float FBody::GetInvMass() const
 {
     return InvMass;
+}
+
+float FBody::GetI() const
+{
+    return I;
+}
+
+float FBody::GetInvI() const
+{
+    return InvI;
 }
 
 bool FBody::IsStatic() const
@@ -173,6 +190,17 @@ void FBody::ApplyImpulse(const FVector2& J)
     }
 
     Velocity += (J * InvMass);
+}
+
+void FBody::ApplyImpulse(const FVector2& J, const FVector2& R)
+{
+    if (IsStatic())
+    {
+        return;
+    }
+
+    Velocity += (J * InvMass);
+    AngularVelocity += (R.Cross(J) * InvI);
 }
 
 void FBody::SetRestitution(float E)
