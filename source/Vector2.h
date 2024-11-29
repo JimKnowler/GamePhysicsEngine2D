@@ -22,6 +22,10 @@ struct FVector2
     // Calculate Dot Product with another 2D vector
     float Dot(const FVector2& Other) const;
 
+    // Calculate Cross Product with another 2D vector
+    // @note 2D cross product result is a scalar, equivalent to magnitude of Z-component of 3D cross-product
+    float Cross(const FVector2& Other) const;
+
     // Rotate vector around the origin
     FVector2& Rotate(const float Radians);
 
@@ -36,7 +40,4 @@ struct FVector2
 
     // Treat this vector as an edge, and generate its normal (assuming clockwise winding rule)
     FVector2 Normal() const;
-
-    // TODO:
-    // CrossProduct -> 2D, generates a scalar 
 };

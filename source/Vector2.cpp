@@ -91,6 +91,11 @@ float FVector2::Dot(const FVector2& Other) const
     return (X * Other.X) + (Y * Other.Y);
 }
 
+float FVector2::Cross(const FVector2& Other) const
+{
+    return (X * Other.Y) - (Y * Other.X);
+}
+
 FVector2& FVector2::Rotate(const float Radians)
 {
     const float Sin = sinf(Radians);
