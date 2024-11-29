@@ -29,7 +29,7 @@ private:
     void TickCollisionDetection();
     void TickCollisionResolution();
 
-    void AddBarrier(float X, float Y, float Width, float Height);
+    void AddBarrier(float X, float Y, float Width, float Height, float Restitution);
 
     void RenderBodies(FRenderer& Renderer) const;
     void RenderContacts(FRenderer& Renderer) const;

@@ -15,25 +15,36 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 {
     FApplication::Init(InConfig);
 
+    ///////////////////////////////////////////////////
     // immovable Box in center of window
     const FVector2 Location = {
         .X = InConfig.WindowWidth / 2.0f,
         .Y = InConfig.WindowHeight / 2.0f
     };
     constexpr float BoxSize = 200.0f;    
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
+    FBody* Box = new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue);
+    Box->SetRestitution(0.5f);
+    Bodies.push_back(Box);
 
+    ///////////////////////////////////////////////////
     // barriers around sides of the window
     const float BarrierWidth = 30.0f;
-    AddBarrier(BarrierWidth / 2.0f, InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
-    AddBarrier(InConfig.WindowWidth - (BarrierWidth / 2.0f), InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
-    AddBarrier(InConfig.WindowWidth / 2.0f, BarrierWidth / 2.0f, InConfig.WindowWidth, BarrierWidth);
-    AddBarrier(InConfig.WindowWidth / 2.0f, InConfig.WindowHeight - (BarrierWidth / 2.0f), InConfig.WindowWidth, BarrierWidth);
+    const float BarrierRestitution = 0.2f;
+    // Left
+    AddBarrier(BarrierWidth / 2.0f, InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth), BarrierRestitution);
+    // Right
+    AddBarrier(InConfig.WindowWidth - (BarrierWidth / 2.0f), InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth), BarrierRestitution);
+    // Top
+    AddBarrier(InConfig.WindowWidth / 2.0f, BarrierWidth / 2.0f, InConfig.WindowWidth, BarrierWidth, BarrierRestitution);
+    // Bottom
+    AddBarrier(InConfig.WindowWidth / 2.0f, InConfig.WindowHeight - (BarrierWidth / 2.0f), InConfig.WindowWidth, BarrierWidth, BarrierRestitution);
 }
 
-void FGamePhysicsEngine2D::AddBarrier(float X, float Y, float Width, float Height)
+void FGamePhysicsEngine2D::AddBarrier(float X, float Y, float Width, float Height, float Restitution)
 {
-    Bodies.push_back(new FBody(new FShapeBox(Width, Height), {.X = X, .Y = Y}, FColour::Blue));
+    FBody* Barrier = new FBody(new FShapeBox(Width, Height), {.X = X, .Y = Y}, FColour::Blue);
+    Barrier->SetRestitution(Restitution);
+    Bodies.push_back(Barrier);
 }
 
 void FGamePhysicsEngine2D::Tick(float dt)
@@ -180,27 +191,39 @@ void FGamePhysicsEngine2D::RenderPolygonNormals(FRenderer& Renderer, const FShap
 
 void FGamePhysicsEngine2D::MouseButtonPressed(int X, int Y, int Button) 
 {
-    if (Button != 1)
-    {
-        return;
-    }
-
     // spawn body
     const FVector2 Location = {
         .X = static_cast<float>(X),
         .Y = static_cast<float>(Y)
     };
 
-#if 0
-    // Circle
-    const float Radius = 30.0f;
-    IShape* Shape = new FShapeCircle(Radius);
-#else
-    // Box
-    const float Width = 40.0f;
-    const float Height = 30.0f;
-    IShape* Shape = new FShapeBox(Width, Height);
-#endif
+    IShape* Shape = nullptr;
+
+    switch (Button)
+    {
+        case 1:
+        {
+            // Circle
+            const float Radius = 30.0f;
+            Shape = new FShapeCircle(Radius);
+            
+            break;
+        }
+        case 3:
+        {
+            // Box
+            const float Width = 40.0f;
+            const float Height = 30.0f;
+            Shape = new FShapeBox(Width, Height);
+
+            break;
+        }
+        default:
+        {
+            // button not supported
+            return;
+        }
+    }
 
     FBody* Body = new FBody(Shape, Location, FColour::Green);
     Body->SetMass(10.0f);
