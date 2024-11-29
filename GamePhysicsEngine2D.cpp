@@ -52,9 +52,6 @@ void FGamePhysicsEngine2D::TickPhysicsSimulation(float dt)
         constexpr float g = 9.81f;
         const float Weight = Body->GetMass() * g * Config.PixelsPerMeter;
         Body->AddForce({0.0f, Weight});
-
-        // Debug - add a torque to make everything spin
-        Body->AddTorque(200.0f);
     }
 
     // integrate forces
@@ -91,10 +88,6 @@ void FGamePhysicsEngine2D::TickCollisionDetection()
                 Contacts.push_back(Contact);
                 A->bIsColliding = true;
                 B->bIsColliding = true;
-
-                // Hack - to prevent bodies accumulating velocity over multiple frames, until they fall through barriers
-                A->SetVelocity(FVector2::ZeroVector);
-                B->SetVelocity(FVector2::ZeroVector);
             }
         }
     }

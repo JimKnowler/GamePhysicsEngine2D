@@ -79,6 +79,13 @@ FVector2 FVector2::operator/(const float Multiplier) const
     return Result;
 }
 
+FVector2 FVector2::operator-() const 
+{
+    FVector2 Result = *this * -1.0f;
+
+    return Result;
+}
+
 float FVector2::Dot(const FVector2& Other) const
 {
     return (X * Other.X) + (Y * Other.Y);

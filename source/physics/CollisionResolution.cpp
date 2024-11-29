@@ -1,9 +1,18 @@
 #include "CollisionResolution.h"
 
+#include <iostream>
+
 void FCollisionResolution::ResolveCollision(const FContact& Contact)
 {
-    // use Projection Method to push bodies apart
+    // push colliding bodies apart
+    ResolveCollisionProjectionMethod(Contact);
 
+    // modify velocities of colliding bodies with impulses
+    ResolveCollisionImpulseMethod(Contact);
+}
+
+void FCollisionResolution::ResolveCollisionProjectionMethod(const FContact& Contact)
+{
     FBody* A = Contact.A;
     FBody* B = Contact.B;
 
@@ -25,4 +34,27 @@ void FCollisionResolution::ResolveCollision(const FContact& Contact)
 
     A->SetLocation(LocationA - (Contact.Normal * dA));
     B->SetLocation(LocationB + (Contact.Normal * dB));
+}
+
+void FCollisionResolution::ResolveCollisionImpulseMethod(const FContact& Contact)
+{
+    FBody* A = Contact.A;
+    FBody* B = Contact.B;
+
+    if (A->IsStatic() && B->IsStatic()) 
+    {
+        return;
+    }
+
+    const float E = std::min(A->GetRestitution(), B->GetRestitution());
+
+    const FVector2 VRel = A->GetVelocity() - B->GetVelocity();
+
+    const float ImpulseMagnitude = -(1.0f + E) * (VRel.Dot(Contact.Normal)) / (A->GetInvMass() + B->GetInvMass());
+    
+    const FVector2 ImpulseDirection = Contact.Normal;
+    const FVector2 Jn = ImpulseDirection * ImpulseMagnitude;
+    
+    A->ApplyImpulse(Jn);
+    B->ApplyImpulse(-Jn);
 }

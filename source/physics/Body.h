@@ -12,7 +12,7 @@ public:
 
     IShape* GetShape() const;
 
-    // Clockwise Rotation, in Radians
+    // Rotation is specifed in Radians, clockwise
     void SetRotation(float NewRotation);
     float GetRotation() const;
 
@@ -25,6 +25,7 @@ public:
     float GetMass() const;
     float GetInvMass() const;
 
+    // Does this body have infitite mass (i.e. InvMass == 0.0f)
     bool IsStatic() const;
 
     // Used to render whether a body is colliding during the current frame
@@ -46,6 +47,12 @@ public:
     void SetAngularVelocity(float NewAngularVelocity);
     float GetAngularVelocity() const;
 
+    void ApplyImpulse(const FVector2& J);
+
+    // Co-efficient of restitution
+    void SetRestitution(float E);
+    float GetRestitution() const;
+
 protected:
     void UpdateShape();
 
@@ -60,6 +67,8 @@ private:
     IShape* Shape;
 
     FColour Colour;
+
+    float Restitution = 1.0f;
 
     // Linear Motion
     float Mass = 0.0f;

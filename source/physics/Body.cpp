@@ -164,3 +164,23 @@ float FBody::GetAngularVelocity() const
 {
     return AngularVelocity;
 }
+
+void FBody::ApplyImpulse(const FVector2& J)
+{
+    if (IsStatic())
+    {
+        return;
+    }
+
+    Velocity += (J * InvMass);
+}
+
+void FBody::SetRestitution(float E)
+{
+    Restitution = E;
+}
+
+float FBody::GetRestitution() const
+{
+    return Restitution;
+}

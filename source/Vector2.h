@@ -17,6 +17,8 @@ struct FVector2
     FVector2 operator*(const float Multiplier) const;
     FVector2 operator/(const float Multiplier) const;
 
+    FVector2 operator-() const;
+
     // Calculate Dot Product with another 2D vector
     float Dot(const FVector2& Other) const;
 
