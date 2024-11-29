@@ -25,8 +25,11 @@ public:
     // << FApplication
 
 private:
+    void TickPhysicsSimulation(float dt);
     void TickCollisionDetection();
     void TickCollisionResolution();
+
+    void AddBarrier(float X, float Y, float Width, float Height);
 
     void RenderBodies(FRenderer& Renderer) const;
     void RenderContacts(FRenderer& Renderer) const;
@@ -34,7 +37,7 @@ private:
 
     std::vector<FBody*> Bodies;
 
-    FBody* MouseMoveBody;
+    FBody* MouseMoveBody = nullptr;
 
     std::vector<FContact> Contacts;
 };

@@ -11,4 +11,6 @@ struct FConfig
     int WindowWidth = 1280;
     
     int WindowHeight = 720;
+
+    float PixelsPerMeter = 100.0f;
 };

@@ -76,3 +76,38 @@ bool FBody::IsStatic() const
 
     return InvMass < Epsilon;
 }
+
+void FBody::AddForce(const FVector2 Force)
+{
+    SumForces += Force;
+}
+
+void FBody::Integrate(float dt)
+{
+    if (IsStatic())
+    {
+        ClearForces();
+        return;
+    }
+
+    Acceleration = SumForces * InvMass;
+    Velocity += (Acceleration * dt);
+    Location += (Velocity * dt);
+
+    ClearForces();
+}
+
+void FBody::ClearForces()
+{
+    SumForces = FVector2::ZeroVector;
+}
+
+void FBody::SetVelocity(const FVector2& NewVelocity)
+{
+    Velocity = NewVelocity;
+}
+
+const FVector2& FBody::GetVelocity() const
+{
+    return Velocity;
+}

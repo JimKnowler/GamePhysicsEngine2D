@@ -15,47 +15,50 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
 {
     FApplication::Init(InConfig);
 
-    const FVector2 Location = {.X = InConfig.WindowWidth / 2.0f,InConfig.WindowHeight / 2.0f};
-
-#if 0
-    // 2 Spheres
-    constexpr float Radius = 100.0f;
-
-    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
-    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/5.0, FColour::Blue));
-#elif 0
-    // 2 Boxes
-    constexpr float BoxSize = 200.0f;
-    
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, 0.0f, FColour::Blue));
-#elif 0
-    // circle and Box
-    constexpr float Radius = 100.0f;
-    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
-    
-    constexpr float BoxSize = 200.0f; 
-    Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
-#else
-    // Box and Circle
-    constexpr float BoxSize = 200.0f; 
+    // immovable Box in center of window
+    const FVector2 Location = {
+        .X = InConfig.WindowWidth / 2.0f,
+        .Y = InConfig.WindowHeight / 2.0f
+    };
+    constexpr float BoxSize = 200.0f;    
     Bodies.push_back(new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue));
 
-    constexpr float Radius = 100.0f;
-    Bodies.push_back(new FBody(new FShapeCircle(Radius), Location, M_PI/3.0, FColour::Blue));
-#endif
+    // barriers around sides of the window
+    const float BarrierWidth = 30.0f;
+    AddBarrier(BarrierWidth / 2.0f, InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
+    AddBarrier(InConfig.WindowWidth - (BarrierWidth / 2.0f), InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
+    AddBarrier(InConfig.WindowWidth / 2.0f, BarrierWidth / 2.0f, InConfig.WindowWidth, BarrierWidth);
+    AddBarrier(InConfig.WindowWidth / 2.0f, InConfig.WindowHeight - (BarrierWidth / 2.0f), InConfig.WindowWidth, BarrierWidth);
+}
 
-    MouseMoveBody = Bodies[0];
-
-    // Collision Response requires bodies have mass
-    Bodies[0]->SetMass(10.0);
-    Bodies[1]->SetMass(0.0);
+void FGamePhysicsEngine2D::AddBarrier(float X, float Y, float Width, float Height)
+{
+    Bodies.push_back(new FBody(new FShapeBox(Width, Height), {.X = X, .Y = Y}, FColour::Blue));
 }
 
 void FGamePhysicsEngine2D::Tick(float dt)
 {
+    TickPhysicsSimulation(dt);
     TickCollisionDetection();
     TickCollisionResolution();
+}
+
+void FGamePhysicsEngine2D::TickPhysicsSimulation(float dt)
+{
+    // apply forces
+    for (FBody* Body: Bodies)
+    {
+        constexpr float g = 9.81f;
+        const float Weight = Body->GetMass() * g * Config.PixelsPerMeter;
+
+        Body->AddForce({0.0f, Weight});
+    }
+
+    // integrate forces
+    for (FBody* Body: Bodies)
+    {
+        Body->Integrate(dt);
+    }
 }
 
 void FGamePhysicsEngine2D::TickCollisionDetection()
@@ -85,6 +88,10 @@ void FGamePhysicsEngine2D::TickCollisionDetection()
                 Contacts.push_back(Contact);
                 A->bIsColliding = true;
                 B->bIsColliding = true;
+
+                // Hack - to prevent bodies accumulating velocity over multiple frames, until they fall through barriers
+                A->SetVelocity(FVector2::ZeroVector);
+                B->SetVelocity(FVector2::ZeroVector);
             }
         }
     }
@@ -177,7 +184,20 @@ void FGamePhysicsEngine2D::RenderPolygonNormals(FRenderer& Renderer, const FShap
 
 void FGamePhysicsEngine2D::MouseButtonPressed(int X, int Y, int Button) 
 {
+    if (Button != 1)
+    {
+        return;
+    }
 
+    // spawn body
+    const FVector2 Location = {
+        .X = static_cast<float>(X),
+        .Y = static_cast<float>(Y)
+    };
+    const float Radius = 30.0f;
+    FBody* Body = new FBody(new FShapeCircle(Radius), Location, FColour::Green);
+    Body->SetMass(10.0f);
+    Bodies.push_back(Body);
 }
 
 void FGamePhysicsEngine2D::MouseButtonReleased(int X, int Y, int Button) 
@@ -187,6 +207,9 @@ void FGamePhysicsEngine2D::MouseButtonReleased(int X, int Y, int Button)
 
 void FGamePhysicsEngine2D::MouseMoved(int X, int Y) 
 {
-    MouseMoveBody->SetLocation({static_cast<float>(X),static_cast<float>(Y)});
+    if (MouseMoveBody)
+    {
+        MouseMoveBody->SetLocation({static_cast<float>(X),static_cast<float>(Y)});
+    }
 }
 
