@@ -3,11 +3,15 @@
 FBody::FBody(IShape* InShape, const FVector2& InLocation, const FColour& InColour) : Shape(InShape), Location(InLocation), Rotation(0.0f), Colour(InColour)
 {
     UpdateShape();
+
+    SetMomentOfIntertia(Shape->GetMomentOfIntertia());
 }
 
 FBody::FBody(IShape* InShape, const FVector2& InLocation, float InRotation, const FColour& InColour) : Shape(InShape), Location(InLocation), Rotation(InRotation), Colour(InColour)
 {
     UpdateShape();
+
+    SetMomentOfIntertia(Shape->GetMomentOfIntertia());
 }
 
 IShape* FBody::GetShape() const
@@ -82,6 +86,11 @@ void FBody::AddForce(const FVector2 Force)
     SumForces += Force;
 }
 
+void FBody::AddTorque(const float Torque)
+{
+    SumTorques += Torque;
+}
+
 void FBody::Integrate(float dt)
 {
     if (IsStatic())
@@ -90,11 +99,33 @@ void FBody::Integrate(float dt)
         return;
     }
 
+    IntegrateLinear(dt);
+    IntegrateAngular(dt);
+
+    UpdateShape();
+}
+
+void FBody::IntegrateLinear(float dt)
+{
     Acceleration = SumForces * InvMass;
     Velocity += (Acceleration * dt);
     Location += (Velocity * dt);
 
     ClearForces();
+}
+
+void FBody::ClearTorque()
+{
+    SumTorques = 0.0f;
+}
+
+void FBody::IntegrateAngular(float dt)
+{
+    AngularAcceleration = SumTorques * InvI;
+    AngularVelocity += (AngularAcceleration * dt);
+    Rotation += (AngularVelocity * dt);
+
+    ClearTorque();
 }
 
 void FBody::ClearForces()
@@ -110,4 +141,26 @@ void FBody::SetVelocity(const FVector2& NewVelocity)
 const FVector2& FBody::GetVelocity() const
 {
     return Velocity;
+}
+
+void FBody::SetMomentOfIntertia(float NewI)
+{
+    I = NewI;
+
+    if (I > 0.0f)
+    {
+        InvI = 1.0f / I;
+    } else {
+        InvI = 0.0f;
+    }
+}
+
+void FBody::SetAngularVelocity(float NewAngularVelocity)
+{
+    AngularVelocity = NewAngularVelocity;
+}
+
+float FBody::GetAngularVelocity() const
+{
+    return AngularVelocity;
 }

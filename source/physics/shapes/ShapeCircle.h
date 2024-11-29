@@ -9,6 +9,10 @@ public:
 
     float GetRadius() const;
 
+    // >> IShape
+    virtual float GetMomentOfIntertia() const override;
+    // << IShape
+
 private:
     float Radius;
 };

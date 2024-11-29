@@ -45,13 +45,16 @@ void FGamePhysicsEngine2D::Tick(float dt)
 
 void FGamePhysicsEngine2D::TickPhysicsSimulation(float dt)
 {
-    // apply forces
+    // apply forces / torques
     for (FBody* Body: Bodies)
     {
+        // Gravity
         constexpr float g = 9.81f;
         const float Weight = Body->GetMass() * g * Config.PixelsPerMeter;
-
         Body->AddForce({0.0f, Weight});
+
+        // Debug - add a torque to make everything spin
+        Body->AddTorque(200.0f);
     }
 
     // integrate forces
@@ -194,8 +197,19 @@ void FGamePhysicsEngine2D::MouseButtonPressed(int X, int Y, int Button)
         .X = static_cast<float>(X),
         .Y = static_cast<float>(Y)
     };
+
+#if 0
+    // Circle
     const float Radius = 30.0f;
-    FBody* Body = new FBody(new FShapeCircle(Radius), Location, FColour::Green);
+    IShape* Shape = new FShapeCircle(Radius);
+#else
+    // Box
+    const float Width = 40.0f;
+    const float Height = 30.0f;
+    IShape* Shape = new FShapeBox(Width, Height);
+#endif
+
+    FBody* Body = new FBody(Shape, Location, FColour::Green);
     Body->SetMass(10.0f);
     Bodies.push_back(Body);
 }

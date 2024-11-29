@@ -1,5 +1,7 @@
 #include "ShapePolygon.h"
 
+#include <iostream>
+
 FShapePolygon::FShapePolygon(const std::vector<FVector2>& InVertices) : IShape(EShapeType::Polygon), VerticesLocal(InVertices)
 {
     VerticesWorld = VerticesLocal;
@@ -80,4 +82,10 @@ float FShapePolygon::FindMinSeparation(const FShapePolygon* A, const FShapePolyg
     }
 
     return MaxSeparation;
+}
+
+float FShapePolygon::GetMomentOfIntertia() const
+{
+    std::cout << "FShapePolygon::GetMomentOfIntertia - not supported!" << std::endl;
+    return 0.0f;
 }

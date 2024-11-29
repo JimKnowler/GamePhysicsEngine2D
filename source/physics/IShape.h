@@ -10,6 +10,8 @@ public:
 
     EShapeType GetShapeType() const;
 
+    virtual float GetMomentOfIntertia() const = 0;
+
 protected:
     friend class FBody;
     

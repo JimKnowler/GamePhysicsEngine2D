@@ -20,6 +20,7 @@ public:
 
     // >> IShape
     virtual void UpdateWorldTransform(const FVector2& Location, const float Rotation) override;
+    virtual float GetMomentOfIntertia() const override;
     // << IShape
 
     static float FindMinSeparation(const FShapePolygon* A, const FShapePolygon* B, FVector2& OutPoint, FVector2& OutNormal);
