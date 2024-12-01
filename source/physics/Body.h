@@ -59,6 +59,10 @@ public:
     void SetRestitution(float E);
     float GetRestitution() const;
 
+    // Co-efficient of friction
+    void SetFriction(float F);
+    float GetFriction() const;
+
 protected:
     void UpdateShape();
     void UpdateMomentOfIntertia();
@@ -75,7 +79,8 @@ private:
 
     FColour Colour;
 
-    float Restitution = 1.0f;
+    float Restitution = 1.0f;       // coefficient of Restitution
+    float Friction = 1.0f;          // coefficient of Friction
 
     // Linear Motion
     float Mass = 0.0f;

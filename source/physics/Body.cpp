@@ -212,3 +212,13 @@ float FBody::GetRestitution() const
 {
     return Restitution;
 }
+
+void FBody::SetFriction(float F)
+{
+    Friction = F;
+}
+
+float FBody::GetFriction() const
+{
+    return Friction;
+}

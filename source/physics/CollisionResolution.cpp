@@ -69,7 +69,6 @@ void FCollisionResolution::ResolveCollisionImpulseMethodLinearAndAngular(const F
         return;
     }
 
-    const float E = std::min(A->GetRestitution(), B->GetRestitution());
 
     // relative velocity: considers both linear velocity and angular velocity at contact point
     const FVector2 Ra = Contact.End - A->GetLocation();
@@ -80,20 +79,43 @@ void FCollisionResolution::ResolveCollisionImpulseMethodLinearAndAngular(const F
     const FVector2 Vb = B->GetVelocity() + FVector2{.X = -Wb * Rb.Y, .Y = Wb * Rb.X};
     const FVector2 VRel = Va - Vb;
 
-    const float RaCrossNormal = Ra.Cross(Contact.Normal);
+    // Calculate Impulse along Normal
+
+    const FVector2& Normal = Contact.Normal;
+
+    const float RaCrossNormal = Ra.Cross(Normal);
     const float RaCrossNormalSq = RaCrossNormal * RaCrossNormal;
-    const float RbCrossNormal = Rb.Cross(Contact.Normal);
+    const float RbCrossNormal = Rb.Cross(Normal);
     const float RbCrossNormalSq = RbCrossNormal * RbCrossNormal;
 
     const float InvIa = A->GetInvI();
     const float InvIb = B->GetInvI();
 
-    const float ImpulseMagnitude = (-(1.0f + E) * (VRel.Dot(Contact.Normal)))
+    const float E = std::min(A->GetRestitution(), B->GetRestitution());
+
+    const float ImpulseMagnitudeN = -(1.0f + E) * (VRel.Dot(Normal))
                                  / (A->GetInvMass() + B->GetInvMass() + (RaCrossNormalSq * InvIa) + (RbCrossNormalSq * InvIb));
     
-    const FVector2 ImpulseDirection = Contact.Normal;
-    const FVector2 Jn = ImpulseDirection * ImpulseMagnitude;
+    const FVector2 Jn = Normal * ImpulseMagnitudeN;
     
-    A->ApplyImpulse(Jn, Ra);
-    B->ApplyImpulse(-Jn, Rb);
+    // Calculate Impulse along Tangent
+    
+    const FVector2 Tangent = Normal.Normal();
+    
+    const float F = std::min(A->GetFriction(), B->GetFriction());
+
+    const float RaCrossTangent = Ra.Cross(Tangent);
+    const float RaCrossTangentSq = RaCrossTangent * RaCrossTangent;
+    const float RbCrossTangent = Rb.Cross(Tangent);
+    const float RbCrossTangentSq = RbCrossTangent * RbCrossTangent;
+
+    const float ImpulseMagnitudeT = F * -(1.0f + E) * (VRel.Dot(Tangent))
+                                    / (A->GetInvMass() + B->GetInvMass() + (RaCrossTangentSq * InvIa) + (RbCrossTangentSq * InvIb));
+    const FVector2 Jt = Tangent * ImpulseMagnitudeT;
+
+    // Apply Normal and Tangent Impulse together
+    
+    const FVector2 J = Jn + Jt;
+    A->ApplyImpulse(J, Ra);
+    B->ApplyImpulse(-J, Rb);
 }

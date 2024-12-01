@@ -23,25 +23,28 @@ void FGamePhysicsEngine2D::Init(const FConfig& InConfig)
     };
     constexpr float BoxSize = 200.0f;    
     FBody* Box = new FBody(new FShapeBox(BoxSize, BoxSize), Location, M_PI / 4.0, FColour::Blue);
-    Box->SetRestitution(0.5f);
+    Box->SetRestitution(1.0f);
+    Box->SetFriction(0.7f);
     Bodies.push_back(Box);
 
     ///////////////////////////////////////////////////
     // barriers around sides of the window
     const float BarrierWidth = 30.0f;
-    const float BarrierRestitution = 0.2f;
     // Left
-    AddBarrier(BarrierWidth / 2.0f, InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth), BarrierRestitution);
+    AddBarrier(BarrierWidth / 2.0f, InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
     // Right
-    AddBarrier(InConfig.WindowWidth - (BarrierWidth / 2.0f), InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth), BarrierRestitution);
+    AddBarrier(InConfig.WindowWidth - (BarrierWidth / 2.0f), InConfig.WindowHeight / 2.0f, BarrierWidth, InConfig.WindowHeight - (2.0f * BarrierWidth));
     // Top
-    AddBarrier(InConfig.WindowWidth / 2.0f, BarrierWidth / 2.0f, InConfig.WindowWidth, BarrierWidth, BarrierRestitution);
+    AddBarrier(InConfig.WindowWidth / 2.0f, BarrierWidth / 2.0f, InConfig.WindowWidth, BarrierWidth);
     // Bottom
-    AddBarrier(InConfig.WindowWidth / 2.0f, InConfig.WindowHeight - (BarrierWidth / 2.0f), InConfig.WindowWidth, BarrierWidth, BarrierRestitution);
+    AddBarrier(InConfig.WindowWidth / 2.0f, InConfig.WindowHeight - (BarrierWidth / 2.0f), InConfig.WindowWidth, BarrierWidth);
 }
 
-void FGamePhysicsEngine2D::AddBarrier(float X, float Y, float Width, float Height, float Restitution)
+void FGamePhysicsEngine2D::AddBarrier(float X, float Y, float Width, float Height)
 {
+    const float Restitution = 0.2f;
+    const float Friction = 0.7f;
+
     FBody* Barrier = new FBody(new FShapeBox(Width, Height), {.X = X, .Y = Y}, FColour::Blue);
     Barrier->SetRestitution(Restitution);
     Bodies.push_back(Barrier);
@@ -227,6 +230,8 @@ void FGamePhysicsEngine2D::MouseButtonPressed(int X, int Y, int Button)
 
     FBody* Body = new FBody(Shape, Location, FColour::Green);
     Body->SetMass(10.0f);
+    Body->SetRestitution(0.5f);
+    Body->SetFriction(0.7f);
     Bodies.push_back(Body);
 }
 
